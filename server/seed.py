@@ -20,22 +20,39 @@ with app.app_context():
 
     print("Creating pizzas...")
 
-    cheese = Pizza(name="Emma", ingredients="Dough, Tomato Sauce, Cheese")
-    pepperoni = Pizza(
-        name="Geri", ingredients="Dough, Tomato Sauce, Cheese, Pepperoni")
-    california = Pizza(
-        name="Melanie", ingredients="Dough, Sauce, Ricotta, Red peppers, Mustard")
-    pizzas = [cheese, pepperoni, california]
+    # Define pizza names and ingredients
+    pizzas_data = [
+        ("Margherita", "Tomato sauce, mozzarella, basil"),
+        ("Pepperoni", "Tomato sauce, mozzarella, pepperoni"),
+        ("Hawaiian", "Tomato sauce, mozzarella, ham, pineapple"),
+        ("BBQ Chicken", "BBQ sauce, mozzarella, chicken, onions"),
+        ("Vegetarian", "Tomato sauce, mozzarella, mushrooms, peppers, onions"),
+        ("Meat Lovers", "Tomato sauce, mozzarella, pepperoni, sausage, bacon"),
+        ("Supreme", "Tomato sauce, mozzarella, pepperoni, sausage, mushrooms, peppers, onions"),
+        ("Buffalo Chicken", "Buffalo sauce, mozzarella, chicken, red onions, ranch drizzle"),
+        ("Margarita", "Tomato sauce, mozzarella, basil, olive oil"),
+        ("Pesto Chicken", "Pesto sauce, mozzarella, chicken, tomatoes, spinach"),
+    ]
+
+    # Create pizzas for each restaurant
+    pizzas = []
+    for restaurant in restaurants:
+        for pizza_name, pizza_ingredients in pizzas_data:
+            pizza = Pizza(name=pizza_name, ingredients=pizza_ingredients)
+            pizzas.append(pizza)
+            db.session.add(pizza)
 
     print("Creating RestaurantPizza...")
 
-    pr1 = RestaurantPizza(restaurant=shack, pizza=cheese, price=1)
-    pr2 = RestaurantPizza(restaurant=bistro, pizza=pepperoni, price=4)
-    pr3 = RestaurantPizza(restaurant=palace, pizza=california, price=5)
-    restaurantPizzas = [pr1, pr2, pr3]
-    db.session.add_all(restaurants)
-    db.session.add_all(pizzas)
-    db.session.add_all(restaurantPizzas)
+    # Create RestaurantPizza entries
+    restaurantPizzas = []
+    for i, restaurant in enumerate(restaurants):
+        for j in range(len(pizzas_data)):
+            price = (i + 1) * (j + 1)  # Price based on restaurant and pizza index
+            rp = RestaurantPizza(restaurant=restaurant, pizza=pizzas[i * len(pizzas_data) + j], price=price)
+            restaurantPizzas.append(rp)
+            db.session.add(rp)
+
     db.session.commit()
 
     print("Seeding done!")
